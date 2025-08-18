@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Регистрация</h1>
+<h3>Регистрируйтесь.</h3>
+<th:block layout:fragment="content">
+    <div>
+        <form th:action="@{/sign-up}" th:method="post" th:object="${userForm}" autocomplete="off">
+            <!--                <input type="hidden" th:field="*{id}">-->
+            <div>
+                <div>
+                    <label for="email">Email</label>
+                    <input type="email" id="email" th:field="*{email}" autocomplete="off">
+                    <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                </div>
+                <div>
+                    <label for="password">Password</label>
+                    <input type="password" id="password" th:field="*{password}" autocomplete="off">
+                    <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                </div>
+                <div>
+                    <label for="username">Username</label>
+                    <input type="text" id="username" th:field="*{username}" autocomplete="off">
+                    <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                </div>
+                <div>
+                    <button type="submit">Регистрация</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</th:block>
+</body>
+</html>

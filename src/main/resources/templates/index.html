@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+<h2>Hello, <span id="myUsername" th:text="${me.username}">USER</span></h2>
+<div class="users list">
+    <div th:if="${users.empty}">
+        <p>Здесь никого нет</p>
+    </div>
+    <div id="users-list-block">
+        <ul id="list">
+            <li th:each="user : ${users}"
+                th:text="${user.username}"
+                id="${user.id}"
+                th:attr="data-userId=${user.id}">user</li>
+        </ul>
+    </div>
+    <div id="chat-block" class="hidden">
+        <div id="messages-block"></div>
+        <div>
+            <form id="messageForm">
+               <input type="text" id="messageInput" class="messageInput">
+               <button type="button" id="sendBtn">send</button>
+           </form>
+       </div>
+   </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script>
+    const currentUserId = [[${me.id}]];
+</script>
+<script src="js/main.js"></script>
+</body>
+</html>
