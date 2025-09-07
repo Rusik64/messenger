@@ -1,7 +1,11 @@
 package com.example.messenger.service;
 
+import com.example.messenger.dto.ProfileResponse;
 import com.example.messenger.dto.UserForm;
+import com.example.messenger.dto.UserResponse;
+import com.example.messenger.repository.FriendRequestRepository;
 import com.example.messenger.repository.UserRepository;
+import com.example.messenger.repository.model.FriendRequest;
 import com.example.messenger.repository.model.User;
 import jakarta.validation.Valid;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,6 +15,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,11 +24,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
+    private final FriendRequestService friendRequestService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, MailService mailService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, MailService mailService, FriendRequestService friendRequestService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.mailService = mailService;
+        this.friendRequestService = friendRequestService;
     }
 
     //sry
@@ -86,5 +93,20 @@ public class UserService {
 
     public Optional<User> getById(Long userId) {
         return userRepository.findById(userId);
+    }
+
+    public ProfileResponse getProfile(Long id, Long myId) {
+        User user = userRepository.findById(id).orElseThrow();
+        ProfileResponse resp = new ProfileResponse(id, user.getUsername(), user.getEmail(), user.isEnabled(), friendRequestService.friendRequestCheck(myId, id));
+        return resp;
+    }
+
+    public List<UserResponse> getAllByUsername(String username, Long id) {
+        List<User> users = userRepository.findByUsernameStartingWithIgnoreCaseAndIdNot(username, id);
+        List<UserResponse> result = new ArrayList<>();
+        users.forEach(u -> {
+            result.add(new UserResponse(u.getId(), u.getUsername()));
+        });
+        return result;
     }
 }

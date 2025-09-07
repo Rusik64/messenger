@@ -1,0 +1,7 @@
+.hidden {
+    visibility: hidden;
+}
+#messages-block {
+    overflow-y: scroll;
+    height: 200;
+}

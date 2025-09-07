@@ -39,7 +39,7 @@ public class ChatController {
 
     @GetMapping("/chat/{userId}")
     @ResponseBody
-    public ResponseEntity<ChatResponse> getMessages(@PathVariable("userId") Long user2Id, Principal principal) {    //ну тут все понятно
+    public ResponseEntity<ChatResponse> getMessages(@PathVariable("userId") Long user2Id, Principal principal) {
         User user1 = userService.getByUsername(principal.getName());
         User user2 = userService.getById(user2Id).orElseThrow();
         ChatRoom chatRoom = chatRoomService.getOrCreate(user1, user2);
@@ -58,6 +58,8 @@ public class ChatController {
         else {
             recipient = newMsg.getChatRoom().getUser1();
         }
-        simpMessagingTemplate.convertAndSendToUser(recipient.getId().toString(), "/queue/messages", new ChatNotification(newMsg.getId(), newMsg.getSender().getId(), newMsg.getChatRoom().getId(), newMsg.getContent()));  //Делал по тутору на ютубе, для чего нужно ChatNotification я пока не понимаю(дто?)
+        simpMessagingTemplate.convertAndSendToUser(recipient.getId().toString(), "/queue/messages", newMsg);  //Делал по тутору на ютубе, для чего нужно ChatNotification я пока не понимаю(дто?)
     }
 }
+
+//new ChatNotification(newMsg.getId(), newMsg.getSender().getId(), newMsg.getChatRoom().getId(), newMsg.getContent())

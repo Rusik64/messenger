@@ -5,7 +5,6 @@ import com.example.messenger.repository.ChatRoomRepository;
 import com.example.messenger.repository.MessageRepository;
 import com.example.messenger.repository.UserRepository;
 import com.example.messenger.repository.model.Message;
-import com.example.messenger.repository.model.User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

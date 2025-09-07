@@ -1,9 +1,12 @@
 package com.example.messenger.controller;
 
+import com.example.messenger.dto.ProfileResponse;
 import com.example.messenger.dto.UserForm;
 import com.example.messenger.dto.UserFormValidator;
+import com.example.messenger.dto.UserResponse;
 import com.example.messenger.repository.model.User;
 import com.example.messenger.service.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -11,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import jakarta.validation.Valid;
 
+import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -65,5 +70,18 @@ public class UserController {
     public ModelAndView loginPage(ModelAndView model) {
         model.setViewName("login");
         return model;
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<ProfileResponse> profile(@PathVariable("userId") Long id, Principal principal) {
+        User me = userService.getByUsername(principal.getName());
+        ProfileResponse resp = userService.getProfile(id, me.getId());
+        return ResponseEntity.ok(resp);
+    }
+
+    @GetMapping("/users/search")
+    public ResponseEntity<List<UserResponse>> search(@RequestParam String query, Principal principal) {
+        User user = userService.getByUsername(principal.getName());
+        return ResponseEntity.ok(userService.getAllByUsername(query, user.getId()));
     }
 }

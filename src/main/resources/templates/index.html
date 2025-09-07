@@ -3,21 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
 <body>
-<h2>Hello, <span id="myUsername" th:text="${me.username}">USER</span></h2>
-<div class="users list">
-    <div th:if="${users.empty}">
-        <p>Здесь никого нет</p>
+<div id="header">
+    <h2 class="header-text">Hello, <span id="myUsername" th:text="${me.username}">USER</span></h2>
+    <div id="requests-button-container">
+        <div class="header-text">
+            <a href="">Запросы</a>
+        </div>
     </div>
-    <div id="users-list-block">
-        <ul id="list">
-            <li th:each="user : ${users}"
-                th:text="${user.username}"
-                id="${user.id}"
-                th:attr="data-userId=${user.id}">user</li>
-        </ul>
+</div>
+    <div id="left-column">
+        <div id="search-container">
+            <input id="users-search" placeholder="поиск" autocomplete="off" type="text">
+        </div>
+        <div id="users-list">
+            <div th:if="${friends.empty}">
+                <p>У вас нет друзей...</p>
+            </div>
+            <div id="users-list-block">
+                <ul id="friends-list">
+                    <li class="user" th:each="user : ${friends}" th:text="${user.username}" data-userId="${user.id}"></li>
+                </ul>
+            </div>
+        </div>
+        <div class="users-result hidden">
+
+        </div>
     </div>
     <div id="chat-block" class="hidden">
         <div id="messages-block"></div>
@@ -27,13 +40,38 @@
                <button type="button" id="sendBtn">send</button>
            </form>
        </div>
-   </div>
-</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-<script>
-    const currentUserId = [[${me.id}]];
-</script>
-<script src="js/main.js"></script>
+    </div>
+    <div id="profile-block" class="hidden">
+        <div id="username-block">
+            <span id="username"></span>
+        </div>
+        <div id="email-block">
+            <span id="email"></span>
+        </div>
+        <div class="no-req-block hidden">
+            <button class="add-friend">Добавить в друзья</button>
+        </div>
+        <div class="waiting-my-req-block hidden">
+            <button class="delete-req">Отменить запрос</button>
+            <p class="add-friend">Вы уже отправили запрос в друзья этому пользователю</p>
+        </div>
+        <div class="waiting-req-to-me-block">
+            <div id="req-message">
+                <p>Этот пользователь отправил вам запрос на добавление в друзья</p>
+            </div>
+            <button class="accept-req button">Принять запрос</button>
+            <button class="delete-req">Отклонить запрос</button>
+        </div>
+        <div class="delete-friend hidden">
+            <button class="delete-req">Удалить из друзей</button>
+            <p class="add-friend">Ваш друг</p>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script>
+        const currentUserId = [[${me.id}]];
+    </script>
+    <script src="js/main.js"></script>
 </body>
 </html>
