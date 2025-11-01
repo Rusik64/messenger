@@ -1,10 +1,8 @@
 package com.example.messenger.controller;
 
-import com.example.messenger.dto.ProfileResponse;
-import com.example.messenger.dto.UserForm;
-import com.example.messenger.dto.UserFormValidator;
-import com.example.messenger.dto.UserResponse;
+import com.example.messenger.dto.*;
 import com.example.messenger.repository.model.User;
+import com.example.messenger.service.ReportService;
 import com.example.messenger.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,10 +20,12 @@ import java.util.Optional;
 public class UserController {
     private final UserService userService;
     private final UserFormValidator userFormValidator;
+    private final ReportService reportService;
 
-    public UserController(UserService userService, UserFormValidator userFormValidator) {
+    public UserController(UserService userService, UserFormValidator userFormValidator, ReportService reportService) {
         this.userService = userService;
         this.userFormValidator = userFormValidator;
+        this.reportService = reportService;
     }
 
     @InitBinder
@@ -83,5 +83,25 @@ public class UserController {
     public ResponseEntity<List<UserResponse>> search(@RequestParam String query, Principal principal) {
         User user = userService.getByUsername(principal.getName());
         return ResponseEntity.ok(userService.getAllByUsername(query, user.getId()));
+    }
+
+    @PostMapping("/change-username")
+    public ResponseEntity<String> changeUsername(Principal principal, @RequestParam("username") String newUsername) {
+        userService.changeUsername(principal.getName(), newUsername);
+        return ResponseEntity.ok("username changed");
+    }
+
+    @PostMapping("/send-report/{message_id}")
+    public ResponseEntity<String> sendReport(Principal principal, @PathVariable("message_id") Long messageId) {
+        reportService.create(principal.getName(), messageId);
+        return ResponseEntity.ok("report created");
+    }
+
+    @GetMapping("/profile")
+    public ModelAndView profile(ModelAndView model, Principal principal) {
+        MyProfileResp profile = userService.getMyProfile(principal.getName());
+        model.addObject("profile", profile);
+        model.setViewName("profile");
+        return model;
     }
 }

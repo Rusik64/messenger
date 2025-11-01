@@ -8,11 +8,13 @@ import java.util.List;
 public class ChatResponse {
     private Long id;    //ChatRoom.id
     private List<Message> messages;
+    private int status;
 
 
-    public ChatResponse(Long id, List<Message> messages) {
+    public ChatResponse(Long id, List<Message> messages, int status) {
         this.id = id;
         this.messages = messages;
+        this.status = status;
     }
 
     public Long getId() {
@@ -29,5 +31,13 @@ public class ChatResponse {
 
     public void setMessages(List<Message> messages) {
         this.messages = messages;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

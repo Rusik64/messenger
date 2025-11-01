@@ -28,6 +28,21 @@
                     <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
                 </div>
                 <div>
+                    <label for="firstname">First Name</label>
+                    <input type="text" id="firstname" th:field="*{firstname}" autocomplete="off">
+                    <div th:if="${#fields.hasErrors('firstname')}" th:errors="*{firstname}"></div>
+                </div>
+                <div>
+                    <label for="secondname">Second Name</label>
+                    <input type="text" id="secondname" th:field="*{secondname}" autocomplete="off">
+                    <div th:if="${#fields.hasErrors('secondname')}" th:errors="*{secondname}"></div>
+                </div>
+                <div>
+                    <label for="birthday">Birthday</label>
+                    <input type="date" id="birthday" th:field="*{birthday}" autocomplete="off">
+                    <div th:if="${#fields.hasErrors('birthday')}" th:errors="*{birthday}"></div>
+                </div>
+                <div>
                     <button type="submit">Регистрация</button>
                 </div>
             </div>

@@ -1,11 +1,13 @@
 package com.example.messenger.service;
 
+import com.example.messenger.dto.MyProfileResp;
 import com.example.messenger.dto.ProfileResponse;
 import com.example.messenger.dto.UserForm;
 import com.example.messenger.dto.UserResponse;
 import com.example.messenger.repository.FriendRequestRepository;
 import com.example.messenger.repository.UserRepository;
 import com.example.messenger.repository.model.FriendRequest;
+import com.example.messenger.repository.model.Role;
 import com.example.messenger.repository.model.User;
 import jakarta.validation.Valid;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,10 +39,14 @@ public class UserService {
     public User register(@Valid UserForm userForm) {
         String passwordHash = passwordEncoder.encode(userForm.getPassword());
         User user = new User();
+        user.setFirstname(userForm.getFirstname());
+        user.setSecondname(userForm.getSecondname());
+        user.setBirthday(userForm.getBirthday());
         user.setUsername(userForm.getUsername());
         user.setEmail(userForm.getEmail());
         user.setPassword(passwordHash);
         user.setToken(generateToken(userForm.getEmail()));
+        user.setRole(Role.USER);
         userRepository.save(user);
         System.out.print("User saved");
         mailService.sendRegistrationMail(user);
@@ -48,13 +54,13 @@ public class UserService {
         return user;
     }
 
-    private String generateToken(String email) {
+    private String generateToken(String smth) {
         String token = "";
         Long secondsFromEpoch = Instant.ofEpochSecond(0L).until(Instant.now(),
                 ChronoUnit.SECONDS);
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            String preToken = email + secondsFromEpoch;
+            String preToken = smth + secondsFromEpoch;
             byte[] array = md.digest(preToken.getBytes());
             StringBuffer sb = new StringBuffer();
             for(int i = 0; i < array.length; ++i) {
@@ -97,7 +103,7 @@ public class UserService {
 
     public ProfileResponse getProfile(Long id, Long myId) {
         User user = userRepository.findById(id).orElseThrow();
-        ProfileResponse resp = new ProfileResponse(id, user.getUsername(), user.getEmail(), user.isEnabled(), friendRequestService.friendRequestCheck(myId, id));
+        ProfileResponse resp = new ProfileResponse(id, user.getUsername(), user.getFirstname(), user.getSecondname(), user.getBirthday(), user.isEnabled(), friendRequestService.friendRequestCheck(myId, id));
         return resp;
     }
 
@@ -105,8 +111,25 @@ public class UserService {
         List<User> users = userRepository.findByUsernameStartingWithIgnoreCaseAndIdNot(username, id);
         List<UserResponse> result = new ArrayList<>();
         users.forEach(u -> {
-            result.add(new UserResponse(u.getId(), u.getUsername()));
+            result.add(new UserResponse(u.getId(), u.getFirstname(), u.getSecondname()));
         });
         return result;
+    }
+
+    public void changeUsername(String username, String newUsername) {
+        User user = userRepository.findByUsername(username);
+        user.setUsername(newUsername);
+        userRepository.save(user);
+    }
+
+    public void banUser(Long id) {
+        User user = userRepository.findById(id).get();
+        user.setActive(false);
+        userRepository.save(user);
+    }
+
+    public MyProfileResp getMyProfile(String username) {
+        User user = userRepository.findByUsername(username);
+        return new MyProfileResp(user.getUsername(), user.getFirstname(), user.getSecondname(), user.getEmail(), user.getBirthday());
     }
 }

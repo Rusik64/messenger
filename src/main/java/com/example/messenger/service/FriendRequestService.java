@@ -48,10 +48,10 @@ public class FriendRequestService {
         List<UserResponse> friends = new ArrayList<>();
         friendRequestRepository.findAcceptedReqs(userId).forEach(fr -> {
             if (!fr.getSender().getId().equals(userId)) {
-                friends.add(new UserResponse(fr.getSender().getId(), fr.getSender().getUsername()));
+                friends.add(new UserResponse(fr.getSender().getId(), fr.getSender().getFirstname(), fr.getSender().getSecondname()));
             }
             else {
-                friends.add(new UserResponse(fr.getReceiver().getId(), fr.getReceiver().getUsername()));
+                friends.add(new UserResponse(fr.getReceiver().getId(), fr.getReceiver().getFirstname(), fr.getReceiver().getSecondname()));
             }
         });
         return friends;
@@ -61,10 +61,10 @@ public class FriendRequestService {
         List<UserResponse> reqs = new ArrayList<>();
         friendRequestRepository.findReqs(userId).forEach(req -> {
             if (!req.getSender().getId().equals(userId)) {
-                reqs.add(new UserResponse(req.getSender().getId(), req.getSender().getUsername()));
+                reqs.add(new UserResponse(req.getSender().getId(), req.getSender().getFirstname(), req.getSender().getSecondname()));
             }
             else {
-                reqs.add(new UserResponse(req.getReceiver().getId(), req.getReceiver().getUsername()));
+                reqs.add(new UserResponse(req.getReceiver().getId(), req.getReceiver().getFirstname(), req.getReceiver().getSecondname()));
             }
         });
         return reqs;
@@ -74,10 +74,10 @@ public class FriendRequestService {
         List<UserResponse> reqs = new ArrayList<>();
         friendRequestRepository.findMyReqs(userId).forEach(req -> {
             if (!req.getSender().getId().equals(userId)) {
-                reqs.add(new UserResponse(req.getSender().getId(), req.getSender().getUsername()));
+                reqs.add(new UserResponse(req.getSender().getId(), req.getSender().getFirstname(), req.getSender().getSecondname()));
             }
             else {
-                reqs.add(new UserResponse(req.getReceiver().getId(), req.getReceiver().getUsername()));
+                reqs.add(new UserResponse(req.getReceiver().getId(), req.getReceiver().getFirstname(), req.getReceiver().getSecondname()));
             }
         });
         return reqs;

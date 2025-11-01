@@ -4,8 +4,10 @@ const messageForm = document.querySelector('#messageForm');
 let username = document.querySelector('#myUsername').innerHTML;
 const messagesBlock = document.querySelector('#messages-block');
 const messageInput = document.querySelector('#messageInput');
+const messageInputBlock = document.querySelector('#message-input-block');
 const sendBtn = document.querySelector('#sendBtn');
 const chatBlock = document.querySelector('#chat-block');
+const noFrBlock = document.querySelector('#not-friend-block');
 const profileBlock = document.querySelector('#profile-block');
 const usernameBlock = document.querySelector('#username');
 const emailBlock = document.querySelector('#email');
@@ -39,26 +41,20 @@ stompClient.connect({}, onConnect, onError);
 //   });
 
 function onConnect() {
-   stompClient.subscribe(`/user/${username}/queue/messages`, onMessageReceived);
-   stompClient.subscribe('/user/public', onMessageReceived);
+   stompClient.subscribe(`/user/queue/messages`, onMessageReceived);
 }
 
 function onError() {
    console.log("Какая-то ошибка.");
 }
 
-//async function loadReqs(userId) {
-//    const friendsReq = await fetch(`/${userId}/friends`);
-//    const frReq = await fetch(`/${userId}/requests`);
-//    const friends = await friendsReq.json();
-//    const reqs = await frReq.json();
-//    friends.forEach(f => {
-//        const userBlock = document.createElement('div');
-//        const
-//    })
-//}
 
-function displayMessage(sender, content) {
+async function sendReport(id) {
+    await fetch(`/send-report/${id}`, {method: 'POST'});
+    console.log("report: " + id);
+}
+
+function displayMessage(sender, content, id) {
    const messageContainer = document.createElement('div');
    messageContainer.classList.add('message');
    if (username === sender) {
@@ -66,38 +62,67 @@ function displayMessage(sender, content) {
    } else {
       messageContainer.classList.add('receiver');
    }
-   const message = document.createElement('p');
-   message.textContent = content;
-   messageContainer.appendChild(message);
+   const flexWrapper = document.createElement('div');
+       flexWrapper.style.display = 'flex';
+       flexWrapper.style.alignItems = 'center';
+       flexWrapper.style.justifyContent = 'space-between';
+
+       // Сообщение
+       const message = document.createElement('p');
+       message.textContent = content;
+       message.style.margin = 0;
+
+       flexWrapper.appendChild(message);
+
+       if (username !== sender) {
+           const reportBtn = document.createElement('span');
+           reportBtn.textContent = '⚠️';
+           reportBtn.dataset.id = id;
+           reportBtn.style.cursor = 'pointer';
+           reportBtn.title = 'Пожаловаться';
+           reportBtn.addEventListener('click', () => sendReport(reportBtn.dataset.id));
+
+           flexWrapper.appendChild(reportBtn);
+           }
+   messageContainer.appendChild(flexWrapper);
    messagesBlock.appendChild(messageContainer);
 }
 
 async function loadMessages(userId) {
+   messageInputBlock.classList.add('hidden');
+   noFrBlock.classList.add('hidden');
    console.log(userId);
    const userChatResponse = await fetch(`/chat/${userId}`);
    const userChat = await userChatResponse.json();
    if (chatBlock.classList.contains('hidden')) {
         chatBlock.classList.remove('hidden');
    }
+   console.log("Status: " + userChat.status);
+   if (userChat.status == 3) {
+       messageInputBlock.classList.toggle('hidden');
+   }
+   else {
+       noFrBlock.classList.toggle('hidden');
+   }
    currentChatId = userChat.id;
    console.log(currentChatId);
    messagesBlock.innerHTML = '';
    userChat.messages.forEach(msg => {
-      displayMessage(msg.sender.username, msg.content);
+      displayMessage(msg.sender.username, msg.content, msg.id);
    });
    messagesBlock.scrollTop = messagesBlock.scrollHeight;
 }
 
 function sendMessage(event) {
    const inputContent = messageInput.value.trim();
-   if (inputContent && stompClient) {
+   if (inputContent && stompClient && friendReqStatus == 3) {
       const chatMessage = {
          content: inputContent,
          senderId: currentUserId,
          chatRoomId: currentChatId
       };
       stompClient.send('/app/chat', {}, JSON.stringify(chatMessage));
-      displayMessage(currentUserId, inputContent);
+      displayMessage(username, inputContent);
    }
    messageInput.value = '';
    messagesBlock.scrollTop = messagesBlock.scrollHeight;
@@ -105,9 +130,9 @@ function sendMessage(event) {
 }
 
 async function onMessageReceived(payload) {
-    const message = JSON.parse(payload);
+    const message = JSON.parse(payload.body);
     if (currentChatId && currentChatId === message.chatRoom.id) {
-        displayMessage(message.sender.username, message.content);
+        displayMessage(message.sender.username, message.content, message.id);
         messagesBlock.scrollTop = messagesBlock.scrollHeight;
     }
 //    if (currentChatId) {
@@ -129,6 +154,7 @@ async function getProfile(userId) {
     selectedUserId = userId;
     const resp = await fetch(`/${userId}`);
     const profile = await resp.json();
+    friendReqStatus = profile.status;
     if (profileBlock.classList.contains('hidden')) {
         profileBlock.classList.remove('hidden');
     }
@@ -160,6 +186,8 @@ async function acceptReq(userId) {
     await fetch(`/accept-req/${userId}`, {method: 'POST'});
     reqToMeBlock.classList.toggle('hidden');
     deleteFriendBlock.classList.toggle('hidden');
+    noFrBlock.classList.add('hidden');
+    messageInputBlock.classList.remove('hidden');
 }
 
 async function deleteReq(userId, event) {
@@ -168,6 +196,8 @@ async function deleteReq(userId, event) {
         deleteFriendBlock.classList.toggle('hidden');
     }
     addFriendBlock.classList.toggle('hidden');
+    noFrBlock.classList.remove('hidden');
+    messageInputBlock.classList.add('hidden');
 }
 
 messageForm.addEventListener('submit', sendMessage, true);
@@ -209,7 +239,7 @@ searchInput.addEventListener('input', async () => {
     });
     const searchResultUsername = document.createElement('div');
     const username = document.createElement('span');
-    username.textContent = u.username;
+    username.textContent = u.firstname;
     searchResultUsername.appendChild(username);
     usersListLi.appendChild(searchResultUsername);
     usersList.appendChild(usersListLi);

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Report Info</title>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+<h1>Жалоба на пользователя: <span th:text="${report.repUsername}">USER</span></h1>
+
+<p><strong>Сообщение жалобы:</strong> <span th:text="${report.messageContent}"></span></p>
+
+<!-- Контекст сообщений -->
+<div id="context-block">
+    <h2>Предыдущие сообщения</h2>
+    <div th:if="${#lists.isEmpty(report.context)}">
+        <p>Нет предыдущих сообщений</p>
+    </div>
+    <ul th:if="${!#lists.isEmpty(report.context)}">
+        <li th:each="msg : ${report.context}">
+            <strong th:text="${msg.sender.username}">Sender</strong>:
+            <span th:text="${msg.content}">Message content</span>
+        </li>
+    </ul>
+</div>
+
+<div id="actions">
+    <button id="acceptBtn">Принять жалобу (заблокировать)</button>
+    <button id="deleteBtn">Отклонить жалобу</button>
+</div>
+
+<script th:inline="javascript">
+    const reportId = /*[[${report.id}]]*/ 0;
+
+    document.getElementById('acceptBtn').addEventListener('click', async () => {
+        const resp = await fetch(`/accept-report?reportId=${reportId}`, {method: 'POST'});
+        if(resp.ok) {
+            alert('Пользователь заблокирован');
+            window.location.href = '/admin';
+        }
+    });
+
+    document.getElementById('deleteBtn').addEventListener('click', async () => {
+        const resp = await fetch('/delete-report', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: `reportId=${reportId}`
+        });
+        if(resp.ok) {
+            alert('Жалоба удалена');
+            window.location.href = '/admin';
+        }
+    });
+</script>
+</body>
+</html>

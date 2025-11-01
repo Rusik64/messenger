@@ -1,32 +1,21 @@
 package com.example.messenger.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-public class ProfileResponse {
-    private Long id;
+public class MyProfileResp {
     private String username;
     private String firstname;
     private String secondname;
+    private String email;
     private LocalDate birthday;
-    private boolean isEnabled;
-    private int status;
 
-    public ProfileResponse(Long id, String username, String firstname, String secondname, LocalDate birthday, boolean isEnabled, int status) {
-        this.id = id;
+    public MyProfileResp(String username, String firstname, String secondname, String email, LocalDate birthday) {
         this.username = username;
         this.firstname = firstname;
         this.secondname = secondname;
+        this.email = email;
         this.birthday = birthday;
-        this.isEnabled = isEnabled;
-        this.status = status;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getUsername() {
@@ -37,20 +26,12 @@ public class ProfileResponse {
         this.username = username;
     }
 
-    public boolean isEnabled() {
-        return isEnabled;
+    public String getEmail() {
+        return email;
     }
 
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getFirstname() {

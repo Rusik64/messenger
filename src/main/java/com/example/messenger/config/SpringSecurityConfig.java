@@ -28,18 +28,28 @@ public class SpringSecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(auth -> auth.
-                        requestMatchers("/sign-up", "/confirm-email/**", "/login", "/js/main.js").permitAll()
-                        .requestMatchers("/").authenticated()
-                        .anyRequest().authenticated())
-                .formLogin(login ->
-                        login.loginPage("/login")
-                                .loginProcessingUrl("/login")
-                                .defaultSuccessUrl("/")
-                ).csrf(csrf -> csrf.disable())
-                .logout(logout ->
-                        logout.logoutSuccessUrl("/login").permitAll());
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/sign-up", "/confirm-email/**", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .formLogin(login -> login
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .defaultSuccessUrl("/", true)
+                        .failureUrl("/login?error=true")
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutSuccessUrl("/login?logout=true")
+                        .permitAll()
+                )
+                .sessionManagement(session ->
+                        session.maximumSessions(1).expiredUrl("/login?expired=true")
+                )
+                .csrf(csrf -> csrf.disable());
         return http.build();
     }
 

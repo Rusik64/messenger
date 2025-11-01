@@ -2,11 +2,11 @@ package com.example.messenger.controller;
 
 import com.example.messenger.dto.ChatResponse;
 import com.example.messenger.dto.MessageDTO;
-import com.example.messenger.repository.model.ChatNotification;
 import com.example.messenger.repository.model.ChatRoom;
 import com.example.messenger.repository.model.Message;
 import com.example.messenger.repository.model.User;
 import com.example.messenger.service.ChatRoomService;
+import com.example.messenger.service.FriendRequestService;
 import com.example.messenger.service.MessageService;
 import com.example.messenger.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -29,12 +29,14 @@ public class ChatController {
     private final MessageService messageService;
     private final ChatRoomService chatRoomService;
     private final SimpMessagingTemplate simpMessagingTemplate;
+    private final FriendRequestService friendRequestService;
 
-    public ChatController(UserService userService, MessageService messageService, ChatRoomService chatRoomService, SimpMessagingTemplate simpMessagingTemplate) {
+    public ChatController(UserService userService, MessageService messageService, ChatRoomService chatRoomService, SimpMessagingTemplate simpMessagingTemplate, FriendRequestService friendRequestService) {
         this.userService = userService;
         this.messageService = messageService;
         this.chatRoomService = chatRoomService;
         this.simpMessagingTemplate = simpMessagingTemplate;
+        this.friendRequestService = friendRequestService;
     }
 
     @GetMapping("/chat/{userId}")
@@ -44,7 +46,7 @@ public class ChatController {
         User user2 = userService.getById(user2Id).orElseThrow();
         ChatRoom chatRoom = chatRoomService.getOrCreate(user1, user2);
         List<Message> messages = messageService.getByChat(chatRoom.getId());    //TODO: Message -> MessageDTO
-        ChatResponse chat = new ChatResponse(chatRoom.getId(), messages);
+        ChatResponse chat = new ChatResponse(chatRoom.getId(), messages, friendRequestService.friendRequestCheck(user2Id, user1.getId()));
         return ResponseEntity.ok(chat);
     }
 
@@ -58,7 +60,7 @@ public class ChatController {
         else {
             recipient = newMsg.getChatRoom().getUser1();
         }
-        simpMessagingTemplate.convertAndSendToUser(recipient.getId().toString(), "/queue/messages", newMsg);  //Делал по тутору на ютубе, для чего нужно ChatNotification я пока не понимаю(дто?)
+        simpMessagingTemplate.convertAndSendToUser(recipient.getUsername(), "/queue/messages", newMsg);  //Делал по тутору на ютубе, для чего нужно ChatNotification я пока не понимаю(дто?)
     }
 }
 

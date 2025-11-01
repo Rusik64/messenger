@@ -13,7 +13,13 @@
             <a href="">Запросы</a>
         </div>
     </div>
+    <div sec:authorize="hasRole('ADMIN')">
+        <a href="/admin">
+            <button>Панель администратора</button>
+        </a>
+    </div>
 </div>
+<div id="main-container">
     <div id="left-column">
         <div id="search-container">
             <input id="users-search" placeholder="поиск" autocomplete="off" type="text">
@@ -24,7 +30,7 @@
             </div>
             <div id="users-list-block">
                 <ul id="friends-list">
-                    <li class="user" th:each="user : ${friends}" th:text="${user.username}" data-userId="${user.id}"></li>
+                    <li class="user" th:each="user : ${friends}" th:text="${user.firstname}" data-userId="${user.id}"></li>
                 </ul>
             </div>
         </div>
@@ -34,12 +40,15 @@
     </div>
     <div id="chat-block" class="hidden">
         <div id="messages-block"></div>
-        <div>
+        <div class="hidden" id="message-input-block">
             <form id="messageForm">
                <input type="text" id="messageInput" class="messageInput">
                <button type="button" id="sendBtn">send</button>
            </form>
        </div>
+        <div class="hidden" id="not-friend-block">
+            <p>Вы не можете писать этому пользователю. Добавьте его в друзья, чтобы написать.</p>
+        </div>
     </div>
     <div id="profile-block" class="hidden">
         <div id="username-block">
@@ -67,6 +76,12 @@
             <p class="add-friend">Ваш друг</p>
         </div>
     </div>
+</div>
+<div id="contextMenu" class="context-menu hidden">
+    <ul id="menu">
+        <li id="reportMessage">Пожаловаться</li>
+    </ul>
+</div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script>
