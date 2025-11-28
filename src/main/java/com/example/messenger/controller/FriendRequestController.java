@@ -25,18 +25,18 @@ public class FriendRequestController {
         this.userService = userService;
     }
 
-//    @GetMapping("/{id}/requests")
-//    public ResponseEntity<List<UserResponse>> requests(@PathVariable("id") Long userId) {
-//        List<UserResponse> reqs = friendRequestService.getReqs(userId);
-//        return ResponseEntity.ok(reqs);
-//    }
-//
-//    @GetMapping("/{id}/friends")
-//    @ResponseBody
-//    public ResponseEntity<List<UserResponse>> friends(@PathVariable("id") Long userId) {
-//        List<UserResponse> friends = friendRequestService.getFriends(userId);
-//        return ResponseEntity.ok(friends);
-//    }
+    @GetMapping("/{id}/requests")
+    public ResponseEntity<List<UserResponse>> requests(@PathVariable("id") Long userId) {
+        List<UserResponse> reqs = friendRequestService.getReqs(userId);
+        return ResponseEntity.ok(reqs);
+    }
+
+    @GetMapping("/{id}/friends")
+    @ResponseBody
+    public ResponseEntity<List<UserResponse>> friends(@PathVariable("id") Long userId) {
+        List<UserResponse> friends = friendRequestService.getFriends(userId);
+        return ResponseEntity.ok(friends);
+    }
 
     @PostMapping("/send-request/{id}")
     public ResponseEntity<String> sendRequest(@PathVariable("id") Long id, Principal principal) {
@@ -46,14 +46,14 @@ public class FriendRequestController {
 
     @PostMapping("/accept-req/{id}")
     public ResponseEntity<String> accept(@PathVariable("id") Long id, Principal principal) {
-        User me = userService.getByUsername(principal.getName());
+        User me = userService.getByEmail(principal.getName());
         friendRequestService.acceptRequest(id, me.getId());
         return ResponseEntity.ok("Request accepted");
     }
 
     @PostMapping("/del-req/{id}")
     public ResponseEntity<String> delete(@PathVariable("id") Long id, Principal principal) {
-        User me = userService.getByUsername(principal.getName());
+        User me = userService.getByEmail(principal.getName());
         friendRequestService.deleteRequest(id, me.getId());
         return ResponseEntity.ok("Request deleted");
     }

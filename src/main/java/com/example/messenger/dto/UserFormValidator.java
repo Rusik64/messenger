@@ -28,5 +28,9 @@ public class UserFormValidator implements Validator {
         if (userService.isUserWithEmailExist(email)) {
             errors.rejectValue("email", "", "User with this email exist.");
         }
+        String username = userForm.getUsername();
+        if (userService.isUserWithUsernameExist(username)) {
+            errors.rejectValue("username", "", "User with this username exist.");
+        }
     }
 }

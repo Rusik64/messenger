@@ -12,6 +12,8 @@
     <h4 class="mb-4 text-center">Вход в аккаунт</h4>
 
     <form th:action="@{/login}" method="post">
+      <p th:if="${param.error == 'email_not_confirmed'}" class="alert alert-danger">Подтвердите адрес электронной почты</p>
+      <p th:if="${param.error == 'blocked'}" class="alert alert-danger">Ваш аккаунт заблокирован администратором</p>
       <div th:if="${param.error}" class="alert alert-danger" role="alert">
         Неверное имя пользователя или пароль.
       </div>
@@ -20,8 +22,8 @@
       </div>
 
       <div class="mb-3">
-        <label for="username" class="form-label">Имя пользователя</label>
-        <input type="text" class="form-control" id="username" name="username" required autofocus>
+        <label for="email" class="form-label">Адрес электронной почты</label>
+        <input type="email" class="form-control" id="email" name="username" required autofocus>
       </div>
 
       <div class="mb-3">
@@ -33,8 +35,14 @@
         <button type="submit" class="btn btn-primary">Войти</button>
       </div>
 
-      <div class="text-center">
-        <a th:href="@{/sign-up}">Еще нет аккаунта? Зарегистрироваться</a>
+      <div class="text-center mt-3">
+        <a th:href="@{/sign-up}" class="text-dark fw-semibold me-3 link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
+          Зарегистрироваться
+        </a>
+        <span class="text-muted">|</span>
+        <a th:href="@{/forgot-password}" class="text-dark fw-semibold ms-3 link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
+          Забыли пароль?
+        </a>
       </div>
     </form>
   </div>

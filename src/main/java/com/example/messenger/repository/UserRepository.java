@@ -12,7 +12,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
     List<User> findAllByIsEnabledTrueAndIdNot(Long id);
     boolean countByEmail(String email);
+    boolean countByUsername(String username);
 
     Optional<User> findByTokenAndIsEnabledFalse(String token);
-    List<User> findByUsernameStartingWithIgnoreCaseAndIdNot(String username, Long id);
+    Optional<User> findByTokenAndIsEnabledTrue(String token);
+
+    List<User> findByUsernameStartingWithIgnoreCaseAndIdNotAndIsEnabledTrueAndIsActiveTrue(String username, Long id);
+
+    User findByEmail(String email);
+
+    Optional<User> findByToken(String token);
 }

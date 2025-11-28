@@ -26,8 +26,8 @@ public class ReportService {
         this.userRepository = userRepository;
     }
 
-    public void create(String reporterName, Long messageId) {
-        User reporter = userRepository.findByUsername(reporterName);
+    public void create(String reporterEmail, Long messageId) {
+        User reporter = userRepository.findByEmail(reporterEmail);
         Message msg = messageRepository.findById(messageId).get();
         Report newReport = new Report();
         newReport.setReporter(reporter);

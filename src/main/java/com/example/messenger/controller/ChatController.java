@@ -42,7 +42,7 @@ public class ChatController {
     @GetMapping("/chat/{userId}")
     @ResponseBody
     public ResponseEntity<ChatResponse> getMessages(@PathVariable("userId") Long user2Id, Principal principal) {
-        User user1 = userService.getByUsername(principal.getName());
+        User user1 = userService.getByEmail(principal.getName());
         User user2 = userService.getById(user2Id).orElseThrow();
         ChatRoom chatRoom = chatRoomService.getOrCreate(user1, user2);
         List<Message> messages = messageService.getByChat(chatRoom.getId());    //TODO: Message -> MessageDTO
@@ -60,7 +60,7 @@ public class ChatController {
         else {
             recipient = newMsg.getChatRoom().getUser1();
         }
-        simpMessagingTemplate.convertAndSendToUser(recipient.getUsername(), "/queue/messages", newMsg);  //Делал по тутору на ютубе, для чего нужно ChatNotification я пока не понимаю(дто?)
+        simpMessagingTemplate.convertAndSendToUser(recipient.getUsername(), "/queue/messages", newMsg);
     }
 }
 

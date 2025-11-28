@@ -3,6 +3,8 @@ package com.example.messenger.config;
 import com.example.messenger.service.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -31,7 +33,7 @@ public class SpringSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/sign-up", "/confirm-email/**", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/sign-up", "/confirm-email/**", "forgot-password", "reset-password", "/login", "/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
@@ -39,7 +41,15 @@ public class SpringSecurityConfig {
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/", true)
-                        .failureUrl("/login?error=true")
+                        .failureHandler((request, response, exception) -> {
+                            if (exception instanceof DisabledException) {
+                                response.sendRedirect("/login?error=email_not_confirmed");
+                            } else if (exception instanceof LockedException) {
+                                response.sendRedirect("/login?error=blocked");
+                            } else {
+                                response.sendRedirect("/login?error");
+                            }
+                        })
                         .permitAll()
                 )
                 .logout(logout -> logout

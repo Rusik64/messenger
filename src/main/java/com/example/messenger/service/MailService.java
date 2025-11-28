@@ -47,4 +47,13 @@ public class MailService {
         String subject = "Registration email confirm";
         sendMail(FROM_DEFAULT, user.getEmail(), subject, content);
     }
+
+    public void sendPwResetMail(User user) {
+        Map<String, Object> replaces = new HashMap<>();
+        replaces.put("username", user.getUsername());
+        replaces.put("token", user.getToken());
+        String content = this.build("pw-reset-email", replaces);
+        String subject = "Вы запросили смену пароля.";
+        sendMail(FROM_DEFAULT, user.getEmail(), subject, content);
+    }
 }

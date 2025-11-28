@@ -23,9 +23,9 @@ public class FriendRequestService {
     }
 
 
-    public FriendRequest save(Long id, String username) {
+    public FriendRequest save(Long id, String email) {
         FriendRequest req = new FriendRequest();
-        User sender = userRepository.findByUsername(username);
+        User sender = userRepository.findByEmail(email);
         User receiver = userRepository.findById(id).orElseThrow();
         req.setSender(sender);
         req.setReceiver(receiver);
@@ -85,8 +85,6 @@ public class FriendRequestService {
 
     public int friendRequestCheck(Long id1, Long id2) {
         Optional<FriendRequest> req = friendRequestRepository.findReq(id1, id2);
-//        Optional<FriendRequest> myReq = friendRequestRepository.findBySenderId(id1);
-//        Optional<FriendRequest> reqToMe = friendRequestRepository.findByReceiverId(id2);
         if (req.isEmpty()) {
             return 0;
         }

@@ -2,55 +2,61 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Report Info</title>
+    <title>Жалоба на пользователя</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/main.css">
 </head>
-<body>
-<h1>Жалоба на пользователя: <span th:text="${report.repUsername}">USER</span></h1>
+<body class="bg-white text-dark d-flex flex-column min-vh-100">
 
-<p><strong>Сообщение жалобы:</strong> <span th:text="${report.messageContent}"></span></p>
-
-<!-- Контекст сообщений -->
-<div id="context-block">
-    <h2>Предыдущие сообщения</h2>
-    <div th:if="${#lists.isEmpty(report.context)}">
-        <p>Нет предыдущих сообщений</p>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container-fluid">
+        <a class="navbar-brand text-white fw-bold" href="/">Messenger</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav align-items-center">
+                <li class="nav-item ms-3">
+                    <a class="btn btn-outline-light btn-sm" href="/logout">Выйти</a>
+                </li>
+            </ul>
+        </div>
     </div>
-    <ul th:if="${!#lists.isEmpty(report.context)}">
-        <li th:each="msg : ${report.context}">
-            <strong th:text="${msg.sender.username}">Sender</strong>:
-            <span th:text="${msg.content}">Message content</span>
-        </li>
-    </ul>
+</nav>
+
+<div class="container mt-4 flex-grow-1">
+    <h1 class="mb-3">Жалоба на пользователя: <span th:text="${report.repUsername}">USER</span></h1>
+
+    <div class="mb-3">
+        <strong>Сообщение жалобы:</strong>
+        <p th:text="${report.messageContent}" class="border p-2 rounded bg-light"></p>
+    </div>
+
+    <div id="context-block" class="mb-3">
+        <h2>Предыдущие сообщения</h2>
+        <div th:if="${#lists.isEmpty(report.context)}">
+            <p class="text-muted">Нет предыдущих сообщений</p>
+        </div>
+        <ul class="list-group" th:if="${!#lists.isEmpty(report.context)}">
+            <li class="list-group-item" th:each="msg : ${report.context}">
+                <strong th:text="${msg.sender.username}">Sender</strong>:
+                <span th:text="${msg.content}">Message content</span>
+            </li>
+        </ul>
+    </div>
+
+    <div id="actions" class="d-flex gap-2">
+        <button id="acceptBtn" class="btn btn-danger">Принять жалобу (заблокировать)</button>
+        <button id="deleteBtn" class="btn btn-secondary">Отклонить жалобу</button>
+    </div>
 </div>
 
-<div id="actions">
-    <button id="acceptBtn">Принять жалобу (заблокировать)</button>
-    <button id="deleteBtn">Отклонить жалобу</button>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script th:inline="javascript">
     const reportId = /*[[${report.id}]]*/ 0;
-
-    document.getElementById('acceptBtn').addEventListener('click', async () => {
-        const resp = await fetch(`/accept-report?reportId=${reportId}`, {method: 'POST'});
-        if(resp.ok) {
-            alert('Пользователь заблокирован');
-            window.location.href = '/admin';
-        }
-    });
-
-    document.getElementById('deleteBtn').addEventListener('click', async () => {
-        const resp = await fetch('/delete-report', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: `reportId=${reportId}`
-        });
-        if(resp.ok) {
-            alert('Жалоба удалена');
-            window.location.href = '/admin';
-        }
-    });
 </script>
+<script src="js/reportInfo.js"></script>
+
 </body>
 </html>
